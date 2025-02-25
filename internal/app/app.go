@@ -3,14 +3,18 @@ package app
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Mihail-Larionow/industrial_backend/internal/config"
 	"github.com/Mihail-Larionow/industrial_backend/internal/server"
 )
 
-const configPath = "config/main.yaml"
-
 func Run() {
+
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "config/main.yaml"
+	}
 
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {

@@ -9,6 +9,8 @@ import (
 
 func CreateHttpServer(port int) *http.Server {
 	router := http.NewServeMux()
+	handler := handler.CreateHandler()
+
 	router.HandleFunc("/execute", handler.Execute)
 
 	return &http.Server{
