@@ -1,0 +1,98 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Test API",
+        "title": "My API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/execute": {
+            "post": {
+                "description": "Получает JSON с инструкциями, выполняет их и возвращает результат",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Instructions"
+                ],
+                "summary": "Выполняет инструкции calc и print",
+                "parameters": [
+                    {
+                        "description": "Список инструкций",
+                        "name": "instructions",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/service.Instruction"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "service.Instruction": {
+            "type": "object",
+            "properties": {
+                "left": {},
+                "op": {
+                    "type": "string"
+                },
+                "right": {},
+                "type": {
+                    "type": "string"
+                },
+                "var": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.Response": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.ResponseItem"
+                    }
+                }
+            }
+        },
+        "service.ResponseItem": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "integer"
+                },
+                "var": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

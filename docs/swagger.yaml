@@ -1,0 +1,64 @@
+definitions:
+  service.Instruction:
+    properties:
+      left: {}
+      op:
+        type: string
+      right: {}
+      type:
+        type: string
+      var:
+        type: string
+    type: object
+  service.Response:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/service.ResponseItem'
+        type: array
+    type: object
+  service.ResponseItem:
+    properties:
+      value:
+        type: integer
+      var:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Test API
+  title: My API
+  version: "1.0"
+paths:
+  /execute:
+    post:
+      consumes:
+      - application/json
+      description: Получает JSON с инструкциями, выполняет их и возвращает результат
+      parameters:
+      - description: Список инструкций
+        in: body
+        name: instructions
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/service.Instruction'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Выполняет инструкции calc и print
+      tags:
+      - Instructions
+swagger: "2.0"
