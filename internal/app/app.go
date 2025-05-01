@@ -30,9 +30,7 @@ func Run() {
 
 	grpcServer := server.CreateGrpcServer(cfg.Server.GrpcPort)
 	log.Printf("gRPC Server is started on %d port", cfg.Server.GrpcPort)
-	go func() {
-		if err := grpcServer.ListenAndServe(); err != nil {
-			log.Printf("gRPC server error: %v", err)
-		}
-	}()
+	if err := grpcServer.ListenAndServe(); err != nil {
+		log.Printf("gRPC server error: %v", err)
+	}
 }
