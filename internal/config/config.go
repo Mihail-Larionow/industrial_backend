@@ -9,7 +9,8 @@ import (
 
 type Config struct {
 	Server struct {
-		Port int
+		HttpPort int
+		GrpcPort int
 	}
 }
 

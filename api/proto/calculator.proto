@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package = "github.com/Mihail-Larionow/industrial_backend/api/proto";
+
+service CalculatorService {
+  rpc Execute (ExecuteRequest) returns (ExecuteResponse) {}
+}
+
+message ExecuteRequest {
+  repeated Instruction instructions = 1;
+}
+
+message ExecuteResponse {
+  repeated ResponseItem items = 1;
+}
+
+message Instruction {
+  string type = 1;
+  string op = 2;
+  string var = 3;
+  string left = 4;
+  string right = 5;
+}
+
+message ResponseItem {
+  string var = 1;
+  int64 value = 2;
+} 

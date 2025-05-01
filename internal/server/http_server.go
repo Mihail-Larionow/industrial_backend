@@ -13,7 +13,7 @@ import (
 
 func CreateHttpServer(port int) *http.Server {
 	router := http.NewServeMux()
-	handler := handler.CreateHandler()
+	handler := handler.CreateHttpHandler()
 	router.HandleFunc("/execute", handler.Execute)
 
 	router.Handle("/swagger/", httpSwagger.WrapHandler)

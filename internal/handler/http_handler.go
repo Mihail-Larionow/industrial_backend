@@ -8,10 +8,16 @@ import (
 	"github.com/Mihail-Larionow/industrial_backend/internal/service"
 )
 
-type HttpHandler struct{}
+type HttpHandler struct {
+	calculatorService *service.CalculatorService
+}
 
-func CreateHandler() *HttpHandler {
-	return &HttpHandler{}
+func CreateHttpHandler() *HttpHandler {
+	memoryRepository := repository.CreateMemoryRepository()
+	calculatorService := service.CreateCalculatorService(memoryRepository)
+	return &HttpHandler{
+		calculatorService: calculatorService,
+	}
 }
 
 // Execute обрабатывает список инструкций
@@ -36,10 +42,7 @@ func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	memoryRepository := repository.CreateMemoryRepository()
-	calculatorService := service.CreateCalculatorService(memoryRepository)
-
-	results := calculatorService.Process(instructions)
+	results := h.calculatorService.Process(instructions)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
