@@ -21,7 +21,7 @@ func (m *MemoryRepositoryImpl) Set(key string, value int64) error {
 	defer m.mutex.Unlock()
 
 	if _, exists := m.data[key]; exists {
-		return fmt.Errorf("переменная %s уже определена", key)
+		return fmt.Errorf("Переменная '%s' уже определена", key)
 	}
 
 	m.data[key] = value

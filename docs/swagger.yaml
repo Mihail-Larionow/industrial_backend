@@ -1,13 +1,27 @@
+basePath: /
 definitions:
+  service.ErrorResponse:
+    properties:
+      error:
+        example: Неверный формат запроса
+        type: string
+    type: object
   service.Instruction:
     properties:
-      left: {}
+      left:
+        example: 1
+        type: integer
       op:
+        example: +
         type: string
-      right: {}
+      right:
+        example: 2
+        type: integer
       type:
+        example: calc
         type: string
       var:
+        example: x
         type: string
     type: object
   service.Response:
@@ -20,8 +34,10 @@ definitions:
   service.ResponseItem:
     properties:
       value:
+        example: 3
         type: integer
       var:
+        example: x
         type: string
     type: object
 host: localhost:8080
@@ -35,9 +51,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Получает JSON с инструкциями, выполняет их и возвращает результат
+      description: Принимает список инструкций для выполнения арифметических операций
+        и вывода результатов
       parameters:
-      - description: Список инструкций
+      - description: Список инструкций для выполнения
         in: body
         name: instructions
         required: true
@@ -49,16 +66,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Успешное выполнение инструкций
           schema:
             $ref: '#/definitions/service.Response'
         "400":
-          description: Bad Request
+          description: Неверный формат запроса
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Выполняет инструкции calc и print
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Выполнение инструкций
       tags:
       - Instructions
 swagger: "2.0"

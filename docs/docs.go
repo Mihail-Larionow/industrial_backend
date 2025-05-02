@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/execute": {
             "post": {
-                "description": "Получает JSON с инструкциями, выполняет их и возвращает результат",
+                "description": "Принимает список инструкций для выполнения арифметических операций и вывода результатов",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,10 +27,10 @@ const docTemplate = `{
                 "tags": [
                     "Instructions"
                 ],
-                "summary": "Выполняет инструкции calc и print",
+                "summary": "Выполнение инструкций",
                 "parameters": [
                     {
-                        "description": "Список инструкций",
+                        "description": "Список инструкций для выполнения",
                         "name": "instructions",
                         "in": "body",
                         "required": true,
@@ -44,18 +44,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Успешное выполнение инструкций",
                         "schema": {
                             "$ref": "#/definitions/service.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Неверный формат запроса",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/service.ErrorResponse"
                         }
                     }
                 }
@@ -63,19 +60,37 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "service.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Неверный формат запроса"
+                }
+            }
+        },
         "service.Instruction": {
             "type": "object",
             "properties": {
-                "left": {},
-                "op": {
-                    "type": "string"
+                "left": {
+                    "type": "integer",
+                    "example": 1
                 },
-                "right": {},
+                "op": {
+                    "type": "string",
+                    "example": "+"
+                },
+                "right": {
+                    "type": "integer",
+                    "example": 2
+                },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "calc"
                 },
                 "var": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "x"
                 }
             }
         },
@@ -94,10 +109,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "value": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "var": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "x"
                 }
             }
         }
@@ -108,7 +125,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "My API",
 	Description:      "Test API",

@@ -7,10 +7,11 @@
         "version": "1.0"
     },
     "host": "localhost:8080",
+    "basePath": "/",
     "paths": {
         "/execute": {
             "post": {
-                "description": "Получает JSON с инструкциями, выполняет их и возвращает результат",
+                "description": "Принимает список инструкций для выполнения арифметических операций и вывода результатов",
                 "consumes": [
                     "application/json"
                 ],
@@ -20,10 +21,10 @@
                 "tags": [
                     "Instructions"
                 ],
-                "summary": "Выполняет инструкции calc и print",
+                "summary": "Выполнение инструкций",
                 "parameters": [
                     {
-                        "description": "Список инструкций",
+                        "description": "Список инструкций для выполнения",
                         "name": "instructions",
                         "in": "body",
                         "required": true,
@@ -37,18 +38,15 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Успешное выполнение инструкций",
                         "schema": {
                             "$ref": "#/definitions/service.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Неверный формат запроса",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/service.ErrorResponse"
                         }
                     }
                 }
@@ -56,19 +54,37 @@
         }
     },
     "definitions": {
+        "service.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Неверный формат запроса"
+                }
+            }
+        },
         "service.Instruction": {
             "type": "object",
             "properties": {
-                "left": {},
-                "op": {
-                    "type": "string"
+                "left": {
+                    "type": "integer",
+                    "example": 1
                 },
-                "right": {},
+                "op": {
+                    "type": "string",
+                    "example": "+"
+                },
+                "right": {
+                    "type": "integer",
+                    "example": 2
+                },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "calc"
                 },
                 "var": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "x"
                 }
             }
         },
@@ -87,10 +103,12 @@
             "type": "object",
             "properties": {
                 "value": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "var": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "x"
                 }
             }
         }

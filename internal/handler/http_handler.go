@@ -8,27 +8,21 @@ import (
 	"github.com/Mihail-Larionow/industrial_backend/internal/service"
 )
 
-type HttpHandler struct {
-	calculatorService *service.CalculatorService
-}
+type HttpHandler struct{}
 
 func CreateHttpHandler() *HttpHandler {
-	memoryRepository := repository.CreateMemoryRepository()
-	calculatorService := service.CreateCalculatorService(memoryRepository)
-	return &HttpHandler{
-		calculatorService: calculatorService,
-	}
+	return &HttpHandler{}
 }
 
-// Execute обрабатывает список инструкций
-// @Summary Выполняет инструкции calc и print
-// @Description Получает JSON с инструкциями, выполняет их и возвращает результат
+// Execute godoc
+// @Summary Выполнение инструкций
+// @Description Принимает список инструкций для выполнения арифметических операций и вывода результатов
 // @Tags Instructions
-// @Accept  json
-// @Produce  json
-// @Param   instructions body []service.Instruction true "Список инструкций"
-// @Success 200 {object} service.Response
-// @Failure 400 {object} map[string]string
+// @Accept json
+// @Produce json
+// @Param instructions body []service.Instruction true "Список инструкций для выполнения"
+// @Success 200 {object} service.Response "Успешное выполнение инструкций"
+// @Failure 400 {object} service.ErrorResponse "Неверный формат запроса"
 // @Router /execute [post]
 func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -38,11 +32,30 @@ func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 
 	var instructions []service.Instruction
 	if err := json.NewDecoder(r.Body).Decode(&instructions); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Неверный формат запроса"})
 		return
 	}
 
-	results := h.calculatorService.Process(instructions)
+	for _, instr := range instructions {
+		if instr.Type != "calc" && instr.Type != "print" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Инструкция '" + instr.Type + "' неизвестна"})
+			return
+		}
+	}
+
+	memoryRepository := repository.CreateMemoryRepository()
+	calculatorService := service.CreateCalculatorService(memoryRepository)
+	results, err := calculatorService.Process(instructions)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(service.ErrorResponse{Error: err.Error()})
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
