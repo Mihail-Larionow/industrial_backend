@@ -34,7 +34,9 @@ func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&instructions); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Неверный формат запроса"})
+		if err := json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Неверный формат запроса"}); err != nil {
+			http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -42,7 +44,9 @@ func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 		if instr.Type != "calc" && instr.Type != "print" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Инструкция '" + instr.Type + "' неизвестна"})
+			if err := json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Инструкция '" + instr.Type + "' неизвестна"}); err != nil {
+				http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+			}
 			return
 		}
 	}
@@ -53,10 +57,15 @@ func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(service.ErrorResponse{Error: err.Error()})
+		if err := json.NewEncoder(w).Encode(service.ErrorResponse{Error: err.Error()}); err != nil {
+			http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+		}
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+	}
 }
