@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mihail-Larionow/industrial_backend/internal/handler"
 	"github.com/Mihail-Larionow/industrial_backend/api/proto"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc"
 )
 
@@ -18,6 +19,7 @@ func CreateGrpcServer(port int) *GrpcServer {
 	grpcServer := grpc.NewServer()
 	calculatorHandler := handler.CreateGrpcHandler()
 	proto.RegisterCalculatorServiceServer(grpcServer, calculatorHandler)
+	reflection.Register(grpcServer)
 
 	return &GrpcServer{
 		server: grpcServer,
