@@ -10,7 +10,6 @@ import (
 )
 
 func Run() {
-
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = "config/main.yaml"
@@ -21,9 +20,17 @@ func Run() {
 		log.Fatalf("Unable to get configuration: %v", err)
 	}
 
-	srv := server.CreateHttpServer(cfg.Server.Port)
-	log.Printf("Server is started on %d port", cfg.Server.Port)
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Failed to start HTTP server: %v", err)
+	httpServer := server.CreateHttpServer(cfg.Server.HttpPort)
+	log.Printf("HTTP Server is started on %d port", cfg.Server.HttpPort)
+	go func() {
+		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Printf("HTTP server error: %v", err)
+		}
+	}()
+
+	grpcServer := server.CreateGrpcServer(cfg.Server.GrpcPort)
+	log.Printf("gRPC Server is started on %d port", cfg.Server.GrpcPort)
+	if err := grpcServer.ListenAndServe(); err != nil {
+		log.Printf("gRPC server error: %v", err)
 	}
 }

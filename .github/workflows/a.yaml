@@ -7,7 +7,62 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
+  LINT:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Install golangci-lint
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+
+    - name: Run golangci-lint
+      run: golangci-lint run ./... --out-format=html > lint-report.html
+
+    - name: Upload lint report
+      uses: actions/upload-artifact@v4
+      with:
+        name: lint-report
+        path: lint-report.html
+
+  TEST:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Run tests with coverage
+      run: |
+        go test -v -coverprofile=coverage.out ./...
+        go tool cover -func=coverage.out
+
+    - name: Generate coverage report
+      run: |
+        go tool cover -html=coverage.out -o coverage.html
+        echo "Coverage report generated at coverage.html"
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.html
+
   BUILD:
+    name: Build
+    needs: [LINT, TEST]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -20,18 +75,18 @@ jobs:
 
     - name: Build
       run: go build -v ./...
-      
-  TEST:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
 
-    - name: Setup Go
-      uses: actions/setup-go@v4
+    - name: Build Docker image
+      run: |
+        docker build -t calculator:latest -f build/Dockerfile .
+
+    - name: Save Docker image
+      run: |
+        docker save calculator:latest > calculator.tar
+
+    - name: Upload Docker image
+      uses: actions/upload-artifact@v4
       with:
-        go-version: '1.20'
-
-    - name: Test
-      run: go test -v ./...
+        name: docker-image
+        path: calculator.tar
       

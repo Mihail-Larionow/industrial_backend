@@ -1,0 +1,116 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Test API",
+        "title": "My API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/execute": {
+            "post": {
+                "description": "Принимает список инструкций для выполнения арифметических операций и вывода результатов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Instructions"
+                ],
+                "summary": "Выполнение инструкций",
+                "parameters": [
+                    {
+                        "description": "Список инструкций для выполнения",
+                        "name": "instructions",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/service.Instruction"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное выполнение инструкций",
+                        "schema": {
+                            "$ref": "#/definitions/service.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат запроса",
+                        "schema": {
+                            "$ref": "#/definitions/service.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "service.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Неверный формат запроса"
+                }
+            }
+        },
+        "service.Instruction": {
+            "type": "object",
+            "properties": {
+                "left": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "op": {
+                    "type": "string",
+                    "example": "+"
+                },
+                "right": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "type": {
+                    "type": "string",
+                    "example": "calc"
+                },
+                "var": {
+                    "type": "string",
+                    "example": "x"
+                }
+            }
+        },
+        "service.Response": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.ResponseItem"
+                    }
+                }
+            }
+        },
+        "service.ResponseItem": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "var": {
+                    "type": "string",
+                    "example": "x"
+                }
+            }
+        }
+    }
+}

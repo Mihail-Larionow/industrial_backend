@@ -9,8 +9,9 @@ import (
 
 type Config struct {
 	Server struct {
-		Port int
-	}
+		HttpPort int `yaml:"http_port"`
+		GrpcPort int `yaml:"grpc_port"`
+	} `yaml:"server"`
 }
 
 func GetConfig(path string) (*Config, error) {

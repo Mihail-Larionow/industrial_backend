@@ -10,10 +10,20 @@ import (
 
 type HttpHandler struct{}
 
-func CreateHandler() *HttpHandler {
+func CreateHttpHandler() *HttpHandler {
 	return &HttpHandler{}
 }
 
+// Execute godoc
+// @Summary Выполнение инструкций
+// @Description Принимает список инструкций для выполнения арифметических операций и вывода результатов
+// @Tags Instructions
+// @Accept json
+// @Produce json
+// @Param instructions body []service.Instruction true "Список инструкций для выполнения"
+// @Success 200 {object} service.Response "Успешное выполнение инструкций"
+// @Failure 400 {object} service.ErrorResponse "Неверный формат запроса"
+// @Router /execute [post]
 func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method allowed", http.StatusMethodNotAllowed)
@@ -22,15 +32,40 @@ func (h *HttpHandler) Execute(w http.ResponseWriter, r *http.Request) {
 
 	var instructions []service.Instruction
 	if err := json.NewDecoder(r.Body).Decode(&instructions); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		if err := json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Неверный формат запроса"}); err != nil {
+			http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+		}
 		return
+	}
+
+	for _, instr := range instructions {
+		if instr.Type != "calc" && instr.Type != "print" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			if err := json.NewEncoder(w).Encode(service.ErrorResponse{Error: "Инструкция '" + instr.Type + "' неизвестна"}); err != nil {
+				http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+			}
+			return
+		}
 	}
 
 	memoryRepository := repository.CreateMemoryRepository()
 	calculatorService := service.CreateCalculatorService(memoryRepository)
-
-	results := calculatorService.Process(instructions)
+	results, err := calculatorService.Process(instructions)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		if err := json.NewEncoder(w).Encode(service.ErrorResponse{Error: err.Error()}); err != nil {
+			http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+		}
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		http.Error(w, "Ошибка при формировании ответа", http.StatusInternalServerError)
+	}
 }

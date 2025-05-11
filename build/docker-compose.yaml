@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  calculator:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    environment:
+      - APP_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 
