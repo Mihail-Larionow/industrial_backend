@@ -58,7 +58,7 @@ docker-compose -f build/docker-compose.yaml up
 
 ### Ручки
 
-Для выполнения инструкций через HTTP, отправьте POST-запрос на `/execute` с телом запроса в формате JSON:
+Для выполнения инструкций через HTTP отправьте POST-запрос на `/execute` с телом запроса в формате JSON:
 
 ```json
 [
@@ -67,7 +67,7 @@ docker-compose -f build/docker-compose.yaml up
 ]
 ```
 
-А для выполнения инструкций через gRPC, отправьте protobuf-сообщение.
+А для выполнения инструкций через gRPC отправьте protobuf-сообщение.
 
 <p align="right"><i>Для тестирования были использованы Postman и BloomRPC</i></p>
 
