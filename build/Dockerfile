@@ -17,6 +17,8 @@ WORKDIR /app
 
 COPY --from=builder /app/calculator .
 
+COPY config/main.yaml /app/config/main.yaml
+
 EXPOSE 8080 9090
 
 CMD ["./calculator"]
