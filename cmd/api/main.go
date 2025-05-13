@@ -6,11 +6,9 @@ import (
 	_ "github.com/Mihail-Larionow/industrial_backend/docs"
 )
 
-// @title My API
+// @title Вычислятор
 // @version 1.0
-// @description Test API
-// @host localhost:8080
-// @BasePath /
+// @description Сервис-калькулятор
 func main() {
 	app.Run()
 }
