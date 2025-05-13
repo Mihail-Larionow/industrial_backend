@@ -1,0 +1,77 @@
+definitions:
+  service.ErrorResponse:
+    properties:
+      error:
+        example: Неверный формат запроса
+        type: string
+    type: object
+  service.Instruction:
+    properties:
+      left:
+        example: 1
+        type: integer
+      op:
+        example: +
+        type: string
+      right:
+        example: 2
+        type: integer
+      type:
+        example: calc
+        type: string
+      var:
+        example: x
+        type: string
+    type: object
+  service.Response:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/service.ResponseItem'
+        type: array
+    type: object
+  service.ResponseItem:
+    properties:
+      value:
+        example: 3
+        type: integer
+      var:
+        example: x
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Сервис-калькулятор
+  title: Вычислятор
+  version: "1.0"
+paths:
+  /execute:
+    post:
+      consumes:
+      - application/json
+      description: Принимает список инструкций для выполнения арифметических операций
+        и вывода результатов
+      parameters:
+      - description: Список инструкций для выполнения
+        in: body
+        name: instructions
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/service.Instruction'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное выполнение инструкций
+          schema:
+            $ref: '#/definitions/service.Response'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Выполнение инструкций
+      tags:
+      - Instructions
+swagger: "2.0"
